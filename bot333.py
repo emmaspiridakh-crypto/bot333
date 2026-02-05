@@ -902,33 +902,32 @@ async def botpanel(ctx):
 # TEMPORARY SUPPORT CALL
 # ==========================
 
-
 @bot.event
 async def on_voice_state_update(member, before, after):
+    # Αν δεν άλλαξε κανάλι, μην κάνεις τίποτα
+    if before.channel == after.channel:
+        return
 
-    # --- TEMP SUPPORT CALL CREATION ---
-    try:
-        # Αν ο χρήστης ΜΠΗΚΕ σε συγκεκριμένο voice channel
-        if after.channel and after.channel.id == SUPPORT_CALL_VC_ID:
+    # Αν μπήκε στο support call channel
+    if after.channel and after.channel.id == SUPPORT_CALL_VC_ID:
 
-            guild = member.guild
-            category = guild.get_channel(TEMP_SUPPORT_CATEGORY_ID)
+        guild = member.guild
+        category = guild.get_channel(TEMP_SUPPORT_CATEGORY_ID)
 
-            overwrites = {
-                guild.default_role:
-                discord.PermissionOverwrite(view_channel=False, connect=False),
-                member:
-                discord.PermissionOverwrite(view_channel=True, connect=True),
-                guild.get_role(STAFF_ROLE_ID):
-                discord.PermissionOverwrite(view_channel=True, connect=True),
-                guild.get_role(MANAGER_ROLE_ID):
-                discord.PermissionOverwrite(view_channel=True, connect=True),
-                guild.get_role(CEO_ROLE_ID):
-                discord.PermissionOverwrite(view_channel=True, connect=True),
-                guild.get_role(OWNER_ROLE_ID):
-                discord.PermissionOverwrite(view_channel=True, connect=True),
-            }
+        # ΕΛΕΓΧΟΣ: Αν υπάρχει ήδη temp channel για αυτόν τον χρήστη
+        for ch in category.voice_channels:
+            if ch.name == f"support-{member.name}":
+                # Απλά μετακίνησέ τον εκεί, ΜΗΝ φτιάξεις νέο
+                await member.move_to(ch)
+                return
 
+
+            # Δημιουργία προσωρινού voice channel
+
+overwrites = {
+            guild.default_role: discord.PermissionOverwrite(view_channel=False, connect=False),
+            member: discord.PermissionOverwrite(view_channel=True, connect=True),
+        }
             # Δημιουργία προσωρινού voice channel
             temp_channel = await guild.create_voice_channel(
                 name=f"support-{member.name}",
@@ -975,6 +974,7 @@ def keep_alive():
     t.start()
 keep_alive()
 bot.run(os.getenv("TOKEN"))
+
 
 
 
