@@ -956,9 +956,10 @@ async def on_voice_state_update(member, before, after):
 
     except Exception as e:
         print("Temp call error:", e)
+
 from flask import Flask
 from threading import Thread
-
+import os
 app = Flask(__name__)
 
 @app.route('/')
@@ -966,7 +967,8 @@ def home():
     return "Bot is running on Koyeb!"
 
 def run_web():
-    app.run(host='0.0.0.0', port=8080)
+    port = int(os.environ.get("PORT", 8080))
+    app.run(host='0.0.0.0', port=port)
 
 def keep_alive():
     t = Thread(target=run_web)
@@ -974,7 +976,8 @@ def keep_alive():
 # ==========================
 # RUN BOT
 # ==========================
-import os
+
 keep_alive()
 bot.run(os.getenv("TOKEN"))
+
 
