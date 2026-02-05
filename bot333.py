@@ -898,62 +898,64 @@ async def botpanel(ctx):
     await ctx.send(embed=embed)
 
 
-# ==========================
-# TEMPORARY SUPPORT CALL
-# ==========================
-
 @bot.event
 async def on_voice_state_update(member, before, after):
     try:
-        # Αν δεν άλλαξε κανάλι, μην κάνεις τίποτα
+        # Αν δεν άλλαξε ΚΑΝΑΛΙ (μόνο mute/deaf/video), μην κάνεις τίποτα
         if before.channel == after.channel:
             return
 
+        # Αν ο χρήστης δεν μπήκε σε κανάλι, μην κάνεις τίποτα
+        if after.channel is None:
+            return
+
         # Αν μπήκε στο support call channel
-        if after.channel and after.channel.id == SUPPORT_CALL_VC_ID:
+        if after.channel.id != SUPPORT_CALL_VC_ID:
+            return
 
-            guild = member.guild
-            category = guild.get_channel(TEMP_SUPPORT_CATEGORY_ID)
+        guild = member.guild
+        category = guild.get_channel(TEMP_SUPPORT_CATEGORY_ID)
 
-            # ΕΛΕΓΧΟΣ: Αν υπάρχει ήδη temp channel για αυτόν τον χρήστη
-            for ch in category.voice_channels:
-                if ch.name == f"support-{member.name}":
-                    await member.move_to(ch)
-                    return
+        # Αν υπάρχει ήδη temp channel για αυτόν τον χρήστη
+        for ch in category.voice_channels:
+            if ch.name == f"support-{member.name}":
+                await member.move_to(ch)
+                return
 
-            # Δημιουργία προσωρινού voice channel
-            overwrites = {
-                guild.default_role: discord.PermissionOverwrite(view_channel=False, connect=False),
-                member: discord.PermissionOverwrite(view_channel=True, connect=True),
-            }
+        # Δημιουργία προσωρινού voice channel
+        overwrites = {
+            guild.default_role: discord.PermissionOverwrite(view_channel=False, connect=False),
+            member: discord.PermissionOverwrite(view_channel=True, connect=True),
+        }
 
-            temp_channel = await guild.create_voice_channel(
-                name=f"support-{member.name}",
-                category=category,
-                overwrites=overwrites,
-                reason="Temporary support call"
-            )
+        temp_channel = await guild.create_voice_channel(
+            name=f"support-{member.name}",
+            category=category,
+            overwrites=overwrites,
+            reason="Temporary support call"
+        )
 
-            # Μετακίνηση χρήστη στο νέο κανάλι
-            await member.move_to(temp_channel)
+        # Μετακίνηση χρήστη στο νέο κανάλι
+        await member.move_to(temp_channel)
 
-            # Διαγραφή όταν αδειάσει
-            async def delete_when_empty():
-                await asyncio.sleep(5)
-                while True:
-                    ch = guild.get_channel(temp_channel.id)
-                    if not ch or len(ch.members) == 0:
-                        try:
-                            await temp_channel.delete(reason="Temp support call empty")
-                        except:
-                            pass
-                        break
-                    await asyncio.sleep(10)
+        # Διαγραφή όταν αδειάσει
+        async def delete_when_empty():
+            await asyncio.sleep(5)
+            while True:
+                ch = guild.get_channel(temp_channel.id)
+                if not ch or len(ch.members) == 0:
+                    try:
+                        await temp_channel.delete(reason="Temp support call empty")
+                    except:
+                        pass
+                    break
+                await asyncio.sleep(10)
 
-            bot.loop.create_task(delete_when_empty())
+        bot.loop.create_task(delete_when_empty())
 
     except Exception as e:
         print("Temp call error:", e)
+        
 from flask import Flask
 from threading import Thread
 import os
@@ -972,6 +974,7 @@ def keep_alive():
     t.start()
 keep_alive()
 bot.run(os.getenv("TOKEN"))
+
 
 
 
