@@ -967,17 +967,14 @@ def home():
     return "Bot is running on Koyeb!"
 
 def run_web():
-    port = int(os.environ.get("PORT", 8080))
+    port = int(os.environ.get("PORT", 8000))
     app.run(host='0.0.0.0', port=port)
 
 def keep_alive():
     t = Thread(target=run_web)
     t.start()
-# ==========================
-# RUN BOT
-# ==========================
-
 keep_alive()
 bot.run(os.getenv("TOKEN"))
+
 
 
