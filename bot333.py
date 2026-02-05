@@ -960,4 +960,5 @@ async def on_voice_state_update(member, before, after):
 # ==========================
 # RUN BOT
 # ==========================
-bot.run("MTQ2ODU3OTQzNDA5NjM2NTU2OA.Grgy05.1K2ZgIAMQLK0N10Wj6S9eso00UnDCaW6jrKDxo")
+import os
+bot.run(os.getenv("TOKEN"))
