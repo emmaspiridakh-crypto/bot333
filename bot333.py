@@ -954,7 +954,6 @@ async def on_voice_state_update(member, before, after):
 
     except Exception as e:
         print("Temp call error:", e)
-
 from flask import Flask
 from threading import Thread
 import os
@@ -973,6 +972,7 @@ def keep_alive():
     t.start()
 keep_alive()
 bot.run(os.getenv("TOKEN"))
+
 
 
 
