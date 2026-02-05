@@ -878,30 +878,16 @@ async def timeout(ctx,
 
 
 # ==========================
-# BOT PANEL
+# TEMPORARY SUPPORT CALL
 # ==========================
 
-
-@bot.command()
-async def botpanel(ctx):
-    embed = discord.Embed(title="Bot Panel", color=discord.Color.purple())
-    embed.add_field(name="General", value="!say, !dmall", inline=False)
-    embed.add_field(name="Tickets",
-                    value="!send support panel, !send buy panel",
-                    inline=False)
-    embed.add_field(name="Applications",
-                    value="!send staff panel, !send managers panel",
-                    inline=False)
-    embed.add_field(name="Moderation",
-                    value="!kick, !ban, !unban, !timeout",
-                    inline=False)
-    await ctx.send(embed=embed)
-
+import time
+user_cooldown = {}  # user_id : timestamp
 
 @bot.event
 async def on_voice_state_update(member, before, after):
     try:
-        # Αν δεν άλλαξε ΚΑΝΑΛΙ (μόνο mute/deaf/video), μην κάνεις τίποτα
+        # Αν δεν άλλαξε κανάλι, μην κάνεις τίποτα
         if before.channel == after.channel:
             return
 
@@ -909,9 +895,18 @@ async def on_voice_state_update(member, before, after):
         if after.channel is None:
             return
 
-        # Αν μπήκε στο support call channel
+        # Αν δεν μπήκε στο support channel, μην κάνεις τίποτα
         if after.channel.id != SUPPORT_CALL_VC_ID:
             return
+
+        # ==========================
+        # COOLDOWN 5 SECONDS
+        # ==========================
+        now = time.time()
+        if member.id in user_cooldown:
+            if now - user_cooldown[member.id] < 5:
+                return  # Μην ξαναφτιάξεις κανάλι
+        user_cooldown[member.id] = now
 
         guild = member.guild
         category = guild.get_channel(TEMP_SUPPORT_CATEGORY_ID)
@@ -974,6 +969,7 @@ def keep_alive():
     t.start()
 keep_alive()
 bot.run(os.getenv("TOKEN"))
+
 
 
 
