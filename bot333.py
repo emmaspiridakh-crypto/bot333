@@ -697,6 +697,29 @@ async def create_ticket(interaction, ticket_type, category_id, allowed_roles):
     await interaction.response.send_message(
         f"Το ticket σου δημιουργήθηκε: {channel.mention}", ephemeral=True)
 
+@bot.command()
+@commands.has_permissions(administrator=True)
+async def supportpanel(ctx):
+    embed = discord.Embed(
+        title="📞 Support Ticket",
+        description="Επίλεξε τι χρειάζεσαι από τα κουμπιά παρακάτω.",
+        color=discord.Color.green()
+    )
+
+    await ctx.send(embed=embed, view=SupportTicketPanel())
+    await ctx.send("Το support panel στάλθηκε επιτυχώς.", delete_after=5)
+
+@bot.command()
+@commands.has_permissions(administrator=True)
+async def buypanel(ctx):
+    embed = discord.Embed(
+        title="💸 Buy / Order / Claim",
+        description="Επίλεξε τι θέλεις να κάνεις.",
+        color=discord.Color.green()
+    )
+
+    await ctx.send(embed=embed, view=BuyTicketPanel())
+    await ctx.send("Το buy panel στάλθηκε επιτυχώς.", delete_after=5)
 
 # ==========================
 # SEND PANELS COMMAND
@@ -758,6 +781,7 @@ async def send(ctx, panel_type=None, panel_name=None):
         return await ctx.send(embed=embed, view=ManagerApplicationPanel())
 
     await ctx.reply("Λάθος χρήση εντολής.")
+
 
 
 # ==========================
@@ -969,6 +993,7 @@ def keep_alive():
     t.start()
 keep_alive()
 bot.run(os.getenv("TOKEN"))
+
 
 
 
