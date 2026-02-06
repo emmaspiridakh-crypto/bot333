@@ -730,8 +730,6 @@ async def buypanel(ctx):
 async def send(ctx, panel_type=None, panel_name=None):
     if panel_type is None or panel_name is None:
         return await ctx.reply("Χρησιμοποίησε:\n"
-                               "`!send support panel`\n"
-                               "`!send buy panel`\n"
                                "`!send staff panel`\n"
                                "`!send managers panel`")
 
@@ -993,6 +991,7 @@ def keep_alive():
     t.start()
 keep_alive()
 bot.run(os.getenv("TOKEN"))
+
 
 
 
