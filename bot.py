@@ -28,7 +28,7 @@ CLAIM_REWARD_CATEGORY_ID = 1468954499887530147
 
 # Temp voice
 TEMP_VOICE_CATEGORY_ID = 1465366473030635788          # κατηγορία για temp voice
-SUPPORT_VOICE_HUB_ID = 1465366816959234109          # το "κεντρικό" support voice όπου μπαίνουν για να δημιουργηθεί temp
+SUPPORT_VOICE_HUB_ID = 1480255476867535089          # το "κεντρικό" support voice όπου μπαίνουν για να δημιουργηθεί temp
 
 # Logs
 TICKET_OPEN_LOG_ID = 1468993859504705643
@@ -516,6 +516,7 @@ async def on_ready():
 
 keep_alive()
 bot.run(os.getenv("TOKEN"))
+
 
 
 
